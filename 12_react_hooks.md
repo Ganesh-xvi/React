@@ -2876,3 +2876,391 @@ And importantly, **neither one is something you need to use everywhere**. They'r
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# `useReducer`
+
+`useReducer` is a React Hook used to manage **more complex state logic**.
+
+You already know:
+
+```text
+useState
+   ↓
+Simple state updates
+```
+
+`useReducer` is useful when:
+
+```text
+State
+  ↓
+Many possible actions
+  ↓
+More complex update logic
+```
+
+---
+
+## 1. Basic Idea
+
+With `useState`:
+
+```text
+setState(...)
+```
+
+With `useReducer`:
+
+```text
+dispatch(action)
+      ↓
+   reducer
+      ↓
+new state
+```
+
+The **reducer** is a function that decides how the state should change.
+
+---
+
+## 2. Simple Example
+
+Imagine a counter.
+
+With `useState`:
+
+```js
+const [count, setCount] = useState(0);
+```
+
+With `useReducer`:
+
+```js
+const [count, dispatch] = useReducer(reducer, 0);
+```
+
+The reducer:
+
+```js
+function reducer(state, action) {
+    if (action.type === "increment") {
+        return state + 1;
+    }
+
+    if (action.type === "decrement") {
+        return state - 1;
+    }
+
+    return state;
+}
+```
+
+Then:
+
+```js
+dispatch({ type: "increment" });
+```
+
+means:
+
+```text
+dispatch action
+      ↓
+{ type: "increment" }
+      ↓
+reducer
+      ↓
+state + 1
+      ↓
+new state
+```
+
+---
+
+# 3. What Is an Action?
+
+An **action** describes what happened.
+
+Example:
+
+```js
+{ type: "increment" }
+```
+
+or:
+
+```js
+{ type: "decrement" }
+```
+
+The `type` tells the reducer which state transition to perform.
+
+You can also send additional data:
+
+```js
+{
+    type: "add",
+    amount: 5
+}
+```
+
+Then the reducer can use:
+
+```text
+action.amount
+```
+
+---
+
+# 4. Reducer
+
+A reducer generally looks like:
+
+```text
+(state, action) → new state
+```
+
+For example:
+
+```text
+Current state: 10
+Action: increment
+        ↓
+Reducer
+        ↓
+New state: 11
+```
+
+Important:
+
+> A reducer should calculate and return the new state. It shouldn't directly modify the existing state.
+
+---
+
+# 5. `dispatch`
+
+`dispatch` sends an action to the reducer.
+
+```js
+dispatch({ type: "increment" });
+```
+
+Flow:
+
+```text
+dispatch()
+   ↓
+action
+   ↓
+reducer(state, action)
+   ↓
+new state
+   ↓
+React re-renders
+```
+
+---
+
+# 6. `useReducer` Syntax
+
+The basic syntax is:
+
+```js
+const [state, dispatch] = useReducer(reducer, initialState);
+```
+
+There are three important pieces:
+
+```text
+state
+ ↓
+Current state
+
+dispatch
+ ↓
+Send an action
+
+reducer
+ ↓
+Decides the next state
+```
+
+---
+
+# 7. `useState` vs `useReducer`
+
+### `useState`
+
+Good for simple state:
+
+```text
+isOpen
+count
+name
+loading
+```
+
+Example:
+
+```js
+const [count, setCount] = useState(0);
+```
+
+### `useReducer`
+
+Useful when state transitions become more involved:
+
+```text
+Cart
+Form
+Authentication state
+Complex UI state
+Multiple related values
+```
+
+---
+
+# 8. Example: Todo State
+
+A Todo application can have actions such as:
+
+```text
+ADD_TODO
+DELETE_TODO
+TOGGLE_TODO
+CLEAR_TODOS
+```
+
+The mental model becomes:
+
+```text
+             dispatch
+                ↓
+       ┌────────┴────────┐
+       ↓        ↓        ↓
+   ADD_TODO  DELETE   TOGGLE
+       │        │        │
+       └────────┴────────┘
+                ↓
+             reducer
+                ↓
+             new state
+```
+
+This becomes easier to manage when there are many state transitions.
+
+---
+
+# 9. `useReducer` + Objects
+
+The state doesn't have to be a single number.
+
+For example:
+
+```text
+{
+    loading: false,
+    user: null,
+    error: null
+}
+```
+
+Actions might be:
+
+```text
+FETCH_START
+FETCH_SUCCESS
+FETCH_ERROR
+```
+
+Flow:
+
+```text
+FETCH_START
+    ↓
+loading = true
+
+FETCH_SUCCESS
+    ↓
+loading = false
+user = data
+
+FETCH_ERROR
+    ↓
+loading = false
+error = error
+```
+
+This is where `useReducer` becomes much more useful than having many unrelated `useState` calls.
+
+---
+
+# 10. Connection to Redux
+
+This is especially useful for your roadmap because you skipped Redux Toolkit.
+
+The concepts are related:
+
+```text
+useReducer
+   ↓
+state + action + reducer
+```
+
+Redux:
+
+```text
+Store
+ ↓
+Action
+ ↓
+Reducer
+ ↓
+New State
+```
+
+So learning `useReducer` gives you the fundamental **reducer pattern** without requiring you to learn Redux itself.
+
+---
+
+# Mental Model
+
+Remember just this:
+
+```text
+STATE
+  ↓
+dispatch(action)
+  ↓
+REDUCER
+  ↓
+NEW STATE
+  ↓
+RENDER
+```
+
+And:
+
+```text
+useState
+→ simpler state
+
+useReducer
+→ more complex state logic
+```
+
+### React Hooks Progress
+
+```text
+[x] useState
+[x] useEffect
+[x] useRef
+[x] useMemo
+[x] useCallback
+[x] useReducer
+```
+
+**React Hooks section is now complete.**
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
