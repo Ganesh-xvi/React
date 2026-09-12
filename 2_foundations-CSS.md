@@ -1096,3 +1096,374 @@ Good for:
 **Grid → two-dimensional**
 
 ------------------------------------------------------------------------------------------------------------------------------------------
+
+# CSS Positioning
+
+## 1. `position: static`
+
+This is the **default**.
+
+```css
+.box {
+  position: static;
+}
+```
+
+The element follows the normal document flow.
+
+`top`, `right`, `bottom`, and `left` generally don't move a static element.
+
+---
+
+## 2. `position: relative`
+
+The element **stays in the normal document flow**, but you can offset it.
+
+```css
+.box {
+  position: relative;
+  top: 20px;
+  left: 10px;
+}
+```
+
+Important:
+
+The original space of the element is still preserved.
+
+```text
+Normal position
+      ↓
+   ┌───────┐
+   │       │
+   └───────┘
+        ↘ moved visually
+```
+
+### Very important use
+
+`relative` is commonly used as the positioning reference for an absolutely positioned child.
+
+```css
+.parent {
+  position: relative;
+}
+
+.child {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+```
+
+---
+
+# 3. `position: absolute`
+
+The element is removed from the normal document flow.
+
+```css
+.child {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+```
+
+An absolutely positioned element looks for its **nearest positioned ancestor**.
+
+Usually:
+
+```css
+.parent {
+  position: relative;
+}
+```
+
+Then:
+
+```text
+parent
+┌─────────────────────────┐
+│                     child
+│                        ↓
+│                     ┌─────┐
+│                     │     │
+│                     └─────┘
+└─────────────────────────┘
+```
+
+This pattern is extremely common for:
+
+* badges
+* icons
+* dropdowns
+* overlays
+* notification counters
+* buttons positioned inside cards
+
+---
+
+# 4. `position: fixed`
+
+The element is positioned relative to the **viewport**.
+
+```css
+.button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+```
+
+It stays in that position even when the page scrolls.
+
+Common examples:
+
+```text
+Chat button
+Back-to-top button
+Floating action button
+Fixed navbar
+```
+
+---
+
+# 5. `position: sticky`
+
+`sticky` behaves like a normal element until a scrolling threshold is reached.
+
+```css
+header {
+  position: sticky;
+  top: 0;
+}
+```
+
+Conceptually:
+
+```text
+Before scrolling
+        ↓
+normal element
+
+Scroll
+        ↓
+reaches top: 0
+
+        ↓
+
+sticks to top
+```
+
+Common example:
+
+```css
+.navbar {
+  position: sticky;
+  top: 0;
+}
+```
+
+---
+
+# Position Summary
+
+| Position   | Normal flow? | Common use                      |
+| ---------- | ------------ | ------------------------------- |
+| `static`   | Yes          | Default                         |
+| `relative` | Yes          | Offset / positioning reference  |
+| `absolute` | No           | Overlay / child positioning     |
+| `fixed`    | No           | Fixed to viewport               |
+| `sticky`   | Yes          | Sticky elements while scrolling |
+
+The most important relationship to remember:
+
+```text
+relative parent
+      ↓
+absolute child
+```
+
+---
+
+# 6. `z-index`
+
+`z-index` controls the **stacking order** of overlapping elements.
+
+Imagine:
+
+```text
+Element A
+   ↓
+Element B
+```
+
+If they overlap, `z-index` can determine which appears on top.
+
+```css
+.modal {
+  z-index: 1000;
+}
+```
+
+Higher stacking level generally appears above a lower one within the relevant stacking context.
+
+Example:
+
+```css
+.box1 {
+  position: relative;
+  z-index: 1;
+}
+
+.box2 {
+  position: relative;
+  z-index: 2;
+}
+```
+
+When they overlap:
+
+```text
+box2
+  ↓
+appears above
+  ↓
+box1
+```
+
+### Common mistake
+
+`z-index: 999999` doesn't magically put an element above everything.
+
+**Stacking contexts matter.**
+
+For normal beginner/intermediate work, remember:
+
+```text
+position + z-index
+        ↓
+control overlapping elements
+```
+
+---
+
+# 7. CSS Variables
+
+CSS variables let you store reusable values.
+
+Define one:
+
+```css
+:root {
+  --primary-color: #2563eb;
+}
+```
+
+Use it:
+
+```css
+button {
+  background: var(--primary-color);
+}
+```
+
+Now if you change:
+
+```css
+--primary-color
+```
+
+every place using it can update.
+
+---
+
+## Multiple Variables
+
+```css
+:root {
+  --primary-color: #2563eb;
+  --text-color: #111827;
+  --background-color: #ffffff;
+  --spacing: 16px;
+}
+```
+
+Then:
+
+```css
+.card {
+  color: var(--text-color);
+  background: var(--background-color);
+  padding: var(--spacing);
+}
+```
+
+---
+
+# 8. Variable Fallback
+
+You can provide a fallback:
+
+```css
+color: var(--text-color, black);
+```
+
+Meaning:
+
+```text
+Does --text-color exist?
+       ↓
+   Yes → use it
+   No  → use black
+```
+
+---
+
+# 9. Variables + Themes
+
+CSS variables become especially useful for themes.
+
+```css
+:root {
+  --background: white;
+  --text: black;
+}
+```
+
+Dark theme:
+
+```css
+.dark {
+  --background: #111;
+  --text: white;
+}
+```
+
+Then:
+
+```css
+body {
+  background: var(--background);
+  color: var(--text);
+}
+```
+
+You can change the theme by changing the variables rather than rewriting every component.
+
+---
+
+# CSS Foundations — Complete
+
+```text
+[x] CSS3
+[x] Box model
+[x] Flexbox
+[x] Grid
+[x] position
+[x] z-index
+[x] CSS variables
+```
+
+----------------------------------------------------------------------------------------------------------------------------------------
