@@ -2061,6 +2061,532 @@ Your roadmap is now:
 [x] Routing
 [x] TypeScript integration
 ```
+-------------------------------------------------------------------------------------------------------------------------------------
+
+## 1. Server Actions
+
+A **Server Action** is a function that runs on the **server**, but can be called directly from your React UI.
+
+Without Server Actions:
+
+```text
+React
+  ↓
+fetch()
+  ↓
+API
+  ↓
+Server
+  ↓
+Database
+```
+
+With Server Actions:
+
+```text
+React
+  ↓
+Server Action
+  ↓
+Database
+```
+
+### Why are they useful?
+
+They are especially useful for operations that **change data**:
+
+```text
+Create
+Update
+Delete
+Submit forms
+```
+
+For example:
+
+```text
+User submits signup form
+        ↓
+Server Action
+        ↓
+Validate data
+        ↓
+Database
+```
+
+The important idea is:
+
+> **The function executes on the server, not in the browser.**
+
+---
+
+## 2. `"use server"`
+
+A Server Action can be marked with:
+
+```text
+"use server"
+```
+
+Example:
+
+```tsx
+"use server";
+
+export async function createTodo(formData: FormData) {
+    const title = formData.get("title");
+
+    // database operation
+}
+```
+
+This function is intended to execute on the server.
+
+You can then use it from a component/form.
+
+The browser does **not** receive the server-only implementation as normal client-side JavaScript.
+
+---
+
+## 3. Server Actions vs API Routes
+
+This distinction is important.
+
+### Route Handler
+
+```text
+Client
+ ↓
+HTTP request
+ ↓
+/api/todos
+ ↓
+Route Handler
+```
+
+You explicitly communicate through an HTTP API.
+
+### Server Action
+
+```text
+Form / Component
+ ↓
+Server Action
+ ↓
+Database
+```
+
+You don't have to manually create an API endpoint just to perform that server-side operation.
+
+---
+
+## 4. When Should You Use Server Actions?
+
+Good use cases:
+
+```text
+Form submission
+Create database record
+Update database record
+Delete database record
+Server-side mutations
+```
+
+For example:
+
+```text
+Create Todo
+      ↓
+Server Action
+      ↓
+Validate
+      ↓
+MongoDB
+```
+
+But if you are building an API that will be consumed by:
+
+```text
+React frontend
+Mobile application
+Another service
+External clients
+```
+
+then a **Route Handler / API** can be more appropriate.
+
+---
+
+# 2. `next.config.js`
+
+Next.js has a configuration file:
+
+```text
+next.config.js
+```
+
+In newer Next.js projects, you may also see:
+
+```text
+next.config.ts
+```
+
+It controls framework-level configuration.
+
+Think:
+
+```text
+Next.js
+   ↓
+next.config
+   ↓
+Project behavior
+```
+
+---
+
+## Common Configuration Options
+
+### `reactStrictMode`
+
+Controls React Strict Mode behavior.
+
+```text
+reactStrictMode: true
+```
+
+Strict Mode helps identify potential problems during development.
+
+---
+
+### `images`
+
+Next.js has built-in image optimization.
+
+You can configure allowed external image sources.
+
+Conceptually:
+
+```text
+Next.js Image
+      ↓
+External image
+      ↓
+Configured domain/source
+```
+
+This is important when using images hosted outside your application.
+
+---
+
+### `redirects`
+
+You can configure redirects.
+
+For example:
+
+```text
+/old-page
+    ↓
+/new-page
+```
+
+Useful when URLs change.
+
+---
+
+### `rewrites`
+
+Rewrites allow one URL to internally point somewhere else without changing the URL displayed to the user.
+
+Conceptually:
+
+```text
+/user
+  ↓
+internal destination
+```
+
+The browser still sees:
+
+```text
+/user
+```
+
+---
+
+### `headers`
+
+You can configure HTTP response headers.
+
+This becomes useful for things such as:
+
+```text
+Security
+Caching
+Browser behavior
+```
+
+---
+
+### `env`
+
+You can expose selected configuration values through Next.js configuration.
+
+However, **don't use this as a way to expose secrets to the browser**.
+
+Anything intentionally exposed to client-side code must be treated as public.
+
+---
+
+## Mental Model
+
+Don't try to memorize every `next.config` option.
+
+Think:
+
+```text
+next.config
+     ↓
+Configure Next.js
+     ├── Images
+     ├── Redirects
+     ├── Rewrites
+     ├── Headers
+     └── Other framework behavior
+```
+
+You'll normally look up the exact option when a project actually needs it.
+
+---
+
+# 3. Route Handlers / API
+
+This is the other major gap.
+
+In modern Next.js App Router, API endpoints are created using:
+
+```text
+route.ts
+```
+
+inside the `app` directory.
+
+For example:
+
+```text
+app/
+└── api/
+    └── todos/
+        └── route.ts
+```
+
+This creates an API endpoint:
+
+```text
+/api/todos
+```
+
+---
+
+## GET Route
+
+A Route Handler can handle HTTP methods such as:
+
+```text
+GET
+POST
+PUT
+PATCH
+DELETE
+```
+
+Example:
+
+```tsx
+export async function GET() {
+    return Response.json({
+        message: "Todos"
+    });
+}
+```
+
+Request:
+
+```text
+GET /api/todos
+```
+
+Response:
+
+```json
+{
+    "message": "Todos"
+}
+```
+
+---
+
+## POST Route
+
+You can handle POST requests:
+
+```tsx
+export async function POST(request: Request) {
+    const body = await request.json();
+
+    return Response.json(body);
+}
+```
+
+Flow:
+
+```text
+POST /api/todos
+       ↓
+Route Handler
+       ↓
+request.json()
+       ↓
+Process data
+       ↓
+Response
+```
+
+---
+
+## Route Handler + Database
+
+This is where it becomes useful in real applications.
+
+Conceptually:
+
+```text
+POST /api/todos
+       ↓
+Route Handler
+       ↓
+Validate request
+       ↓
+Database
+       ↓
+Create Todo
+       ↓
+Response
+```
+
+So Next.js can act as both:
+
+```text
+Frontend
++
+Backend API
+```
+
+---
+
+# Route Handlers vs Express
+
+You already learned Express, so compare them:
+
+### Express
+
+```text
+app.get("/todos", handler)
+app.post("/todos", handler)
+```
+
+### Next.js Route Handler
+
+```text
+app/
+└── api/
+    └── todos/
+        └── route.ts
+```
+
+with:
+
+```text
+export async function GET()
+export async function POST()
+```
+
+Both can create backend endpoints.
+
+The difference is that Next.js integrates the API directly into the Next.js application.
+
+---
+
+# Important Difference
+
+Don't confuse:
+
+```text
+Server Action
+```
+
+with:
+
+```text
+Route Handler
+```
+
+### Server Action
+
+Best thought of as:
+
+```text
+Server-side function
+      ↓
+Called by your application
+      ↓
+Usually mutations/forms
+```
+
+### Route Handler
+
+Best thought of as:
+
+```text
+HTTP API endpoint
+      ↓
+GET / POST / PUT / PATCH / DELETE
+      ↓
+Can serve clients through HTTP
+```
+
+---
+
+# Final Mental Model
+
+Your Next.js backend capabilities now look like:
+
+```text
+                    Next.js
+                       │
+          ┌────────────┴────────────┐
+          ↓                         ↓
+   Server Actions              Route Handlers
+          ↓                         ↓
+ Server-side functions          HTTP API
+          ↓                         ↓
+      Database                  Database
+```
+
+And configuration:
+
+```text
+next.config.ts
+      ↓
+Next.js configuration
+      ├── Images
+      ├── Redirects
+      ├── Rewrites
+      ├── Headers
+      └── Other options
+```
+
 
 **Phase 15 — Frameworks: COMPLETE**
 
