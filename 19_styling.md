@@ -7576,6 +7576,34 @@ shadcn/ui → reusable components you own
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 
+Simplest version:
+
+**Normal way (MUI, Ant Design):** you install a package, use their components, but can't see or change the actual code inside them.
+
+**shadcn/ui way:** it **copies the component's code directly into your project folder.** You literally own the file, can open it, edit it, change anything.
+
+```
+npx shadcn add button
+```
+
+This doesn't install a package — it creates a real file in your project:
+```
+components/ui/button.tsx
+```
+
+You open that file, see actual React code, and can change colors, sizes, behavior — anything, because it's your file now, not a hidden library.
+
+Then you use it normally:
+```tsx
+import { Button } from "@/components/ui/button";
+
+<Button>Click me</Button>
+```
+
+**One sentence:** shadcn/ui gives you the code, not a package — so you fully control and customize every component.
+
+
+------------------------------------------------------------------------------------------------------------------------------------------
 
 # 14. Styling Phase Complete
 
